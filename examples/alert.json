@@ -1,0 +1,17 @@
+{
+  "severity": "critical",
+  "title": "Checkout API error rate spike",
+  "description": "Error rate on `checkout-api` crossed *5%* over the last 5 minutes.",
+  "source": "prometheus/checkout-api",
+  "dedupe_key": "checkout-api-error-rate",
+  "fields": {
+    "Environment": "production",
+    "Region": "eu-west-1",
+    "Error rate": "7.4%",
+    "Threshold": "5.0%"
+  },
+  "links": {
+    "View dashboard": "https://grafana.example.com/d/checkout",
+    "Open runbook": "https://runbooks.example.com/checkout-api"
+  }
+}

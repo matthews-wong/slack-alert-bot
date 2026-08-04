@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slack-alert-bot"
+version = "0.1.0"
+description = "Route operational alerts to Slack with rich, actionable Block Kit formatting."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Matthews Wong" }]
+keywords = ["slack", "alerts", "block-kit", "observability", "webhook"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Monitoring",
+]
+dependencies = ["requests>=2.31"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[project.scripts]
+slack-alert-bot = "slackalert.cli:main"
+
+[tool.setuptools]
+packages = ["slackalert"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
