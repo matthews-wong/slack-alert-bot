@@ -40,6 +40,7 @@ interchangeable.
 
 - **Block Kit rendering** — header, description, two-column fields grid, link buttons, and a context footer.
 - **Severity → style mapping** — `info` / `warning` / `error` / `critical` each map to a color and emoji.
+- **Safe text handling** — untrusted alert content is Slack-escaped (`&`, `<`, `>`) so it can't misrender or inject link markup.
 - **Injectable transport** — swap real webhook delivery for `MockTransport` in tests and demos.
 - **De-dupe / throttle** — suppress repeat alerts within a rolling window, using an injectable clock (no real sleeps).
 - **CLI + library** — build alerts from flags, a JSON file, or Python objects.

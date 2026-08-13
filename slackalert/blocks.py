@@ -20,6 +20,24 @@ SEVERITY_STYLE: Dict[Severity, Dict[str, str]] = {
 }
 
 
+def escape_text(text: str) -> str:
+    """Escape the three characters Slack treats as markup control chars.
+
+    Slack requires ``&``, ``<`` and ``>`` to be HTML-escaped inside any
+    ``text`` field (both ``plain_text`` and ``mrkdwn``); see
+    https://api.slack.com/reference/surfaces/formatting#escaping. Without
+    this, ``&`` renders wrong and untrusted content like
+    ``<https://evil|click>`` is interpreted as an injected link. ``&`` must
+    be replaced first so the ``&`` in ``&lt;``/``&gt;`` is not re-escaped.
+    """
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
 def severity_color(severity: Severity) -> str:
     """Return the hex color associated with a severity."""
     return SEVERITY_STYLE[severity]["color"]
@@ -38,7 +56,7 @@ def build_blocks(alert: Alert) -> List[dict]:
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"{style['emoji']} {alert.title}",
+                "text": f"{style['emoji']} {escape_text(alert.title)}",
                 "emoji": True,
             },
         }
@@ -48,7 +66,7 @@ def build_blocks(alert: Alert) -> List[dict]:
         blocks.append(
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": alert.description},
+                "text": {"type": "mrkdwn", "text": escape_text(alert.description)},
             }
         )
 
@@ -57,7 +75,10 @@ def build_blocks(alert: Alert) -> List[dict]:
             {
                 "type": "section",
                 "fields": [
-                    {"type": "mrkdwn", "text": f"*{key}*\n{value}"}
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*{escape_text(key)}*\n{escape_text(value)}",
+                    }
                     for key, value in alert.fields.items()
                 ],
             }
@@ -70,7 +91,7 @@ def build_blocks(alert: Alert) -> List[dict]:
                 "elements": [
                     {
                         "type": "button",
-                        "text": {"type": "plain_text", "text": label, "emoji": True},
+                        "text": {"type": "plain_text", "text": escape_text(label), "emoji": True},
                         "url": url,
                     }
                     for label, url in alert.links.items()
@@ -80,7 +101,7 @@ def build_blocks(alert: Alert) -> List[dict]:
 
     context_parts = [f"Severity: *{alert.severity.value.upper()}*"]
     if alert.source:
-        context_parts.append(f"Source: `{alert.source}`")
+        context_parts.append(f"Source: `{escape_text(alert.source)}`")
     blocks.append(
         {
             "type": "context",
@@ -102,7 +123,7 @@ def build_payload(alert: Alert) -> dict:
                 "color": style["color"],
                 "blocks": build_blocks(alert),
                 # Plaintext fallback for notifications / clients without Block Kit.
-                "fallback": f"[{alert.severity.value.upper()}] {alert.title}",
+                "fallback": f"[{alert.severity.value.upper()}] {escape_text(alert.title)}",
             }
         ]
     }
